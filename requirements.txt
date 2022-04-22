@@ -1,2 +1,2 @@
-pynput       > 1.7.6
-pysimplegui  > 4.59.0
+pynput       >= 1.7.6
+pysimplegui  >= 4.59.0
