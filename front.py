@@ -101,14 +101,16 @@ while run:
             opsiPemain = option.Gunting
 
         enemyPick = enemy_pick_randomizer()
-        description = opsiPemain.beats(enemyPick)
-
-        if description:
-            winCount += 1
+        menang = opsiPemain.beats(enemyPick)
+        
+        if menang == -1:
+            description = "Seri"
         else:
-            lostCount += 1
-
-        description = "Menang Yey" if description else "Kalah :("
+            if menang:
+                winCount += 1
+            else:
+                lostCount += 1
+            description = "Menang Yey" if menang else "Kalah :("
 
         window["PilihanUser"].update(STRING_CONVERTER[opsiPemain.__str__().lower()])
         window["PilihanBot"].update(STRING_CONVERTER[enemyPick.__str__().lower()])

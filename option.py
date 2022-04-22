@@ -29,6 +29,8 @@ class Option:
         self.BeatsList.append(str(option).lower())
 
     def beats(self, other):
+        if str(other).lower() == str(self).lower():
+            return -1
         return str(other).lower() in self.BeatsList
 
 
