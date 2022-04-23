@@ -26,7 +26,7 @@ REALHEIGHT = HEIGHT//4
 CENTERWIDTH = REALWIDTH//2
 CENTERHEIGHT = REALHEIGHT//2
 
-ps.set_options(font=("Font\Twentieth Century.ttf", 12))
+ps.set_options(font=(".\Font\Twentieth Century.ttf", 12))
 
 titleSpace = 5
 resultLayout = [
@@ -37,7 +37,6 @@ resultLayout = [
 
 mainLayout = [ # Sumpah ini berantakan co
     [ps.Text("-"*(CENTERWIDTH-len(TITLE)-titleSpace)+" "*titleSpace+TITLE+" "*titleSpace+"-"*(CENTERWIDTH-len(TITLE)-titleSpace))],
-    [ps.DropDown],
     [ps.Text("\n"*10)],
     [ps.Text(" "*(CENTERWIDTH-25)), ps.Button("🖐️", size=(5, 2), font=20, key="kertas", disabled_button_color="gray"), ps.Button("✌️", size=(5, 2), font=20, key="gunting", disabled_button_color="gray"), ps.Button("✊", size=(5, 2), font=20, key="batu", disabled_button_color="gray")],
     [ps.Text(" "*(CENTERWIDTH-25)), ps.Text("Win : 0", key="winCount"), ps.Text("Lost : 0", key="lostCount")],
@@ -112,12 +111,15 @@ while run:
         enemyPick = enemy_pick_randomizer()
         description = opsiPemain.beats(enemyPick)
 
-        if description:
+        if description is True:
             winCount += 1
             currentWs += 1
             currentLs = 0
             if currentWs > winStreak:
                 winStreak = currentWs
+        elif description == -1:
+            currentLs = 0
+            currentWs = 0
         else:
             lostCount += 1
             currentLs += 1
