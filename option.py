@@ -4,9 +4,25 @@ class Option:
     """Option With case-insensitivity"""
     OPTIONS = {}
     
-    def __init__(self, name: str, BeatsList: list=[]):
+    def __setattr__(self, name, value):
+        return self.extras.__setitem__(name, value)
+    
+    def __setitem__(self, name, value):
+        return self.extras.__setitem__(name, value)
+    
+    def __getattribute__(self, name):
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            return self.extras.__getitem__(name)
+    
+    def __getitem__(self, name):
+        return self.extras.__getitem__(name)
+    
+    def __init__(self, name: str, BeatsList: list=[], **extra_attributes):
         self._name = name
         self.BeatsList = [str(option).lower() for option in BeatsList]
+        self.extras = extra_attributes
         
         self.OPTIONS[name] = self
 
@@ -34,6 +50,6 @@ class Option:
         return str(other).lower() in self.BeatsList
 
 
-Batu = Option('Batu', ['Gunting'])
-Kertas = Option('Kertas', ['Batu'])
-Gunting = Option('Gunting', ['Kertas'])
+Batu = Option('Batu', ['Gunting'], display_char="✊")
+Kertas = Option('Kertas', ['Batu'], display_char="🖐️")
+Gunting = Option('Gunting', ['Kertas'], display_char="✌️")
