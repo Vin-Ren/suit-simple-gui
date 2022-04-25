@@ -1,7 +1,7 @@
-
+from front import start
 
 def main():
-    pass
+    start()
 
 
 if __name__ == '__main__':
