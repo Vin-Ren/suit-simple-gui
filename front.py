@@ -1,9 +1,15 @@
 import random
 import PySimpleGUI as ps
 import option
+import sys
+import os
+listDir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(listDir+"\saveFolder")
+import save
 
 from pynput import keyboard
 
+SAVE_FILE_PATH = listDir+r"\saveFolder\save.py"
 
 
 def enemy_pick_randomizer():
@@ -16,6 +22,12 @@ STRING_CONVERTER = {
     "gunting":"✌️"
 }
 
+COLOR_CONVERTER = {
+    "red":"#ff0000",
+    "light":"#aaaaaa",
+    "dark":"#222222"
+}
+
 TITLE = "BaGuKer"
 WIDTH = 600
 HEIGHT = 800
@@ -26,42 +38,64 @@ REALHEIGHT = HEIGHT//4
 CENTERWIDTH = REALWIDTH//2
 CENTERHEIGHT = REALHEIGHT//2
 
-ps.set_options(font=(".\Font\Twentieth Century.ttf", 12))
+ps.set_options(font=(".\Font\Twentieth Century.ttf", 12), background_color="black")
+
+winCount = save.WinCount
+lostCount = save.LostCount
+
+winStreak = save.WinStreak
+loseStreak = save.LoseStreak
+currentWs = save.CurrentWS
+currentLs = save.CurrentLS
+
+buttonColor = "#222222"
+backgroundColor = "#666666"
 
 titleSpace = 5
 resultLayout = [
-    [ps.Text("", key="PilihanUser", font=20, background_color="#aa0000"), ps.Text("VS",background_color="#550000", font=18), ps.Text("", key="PilihanBot", font=20, background_color="#aa0000")],
+    [ps.Text("", key="PilihanUser", font=20, background_color="#aa0000"), ps.Text("VS",background_color="#550000",key="vs", font=18), ps.Text("", key="PilihanBot", font=20, background_color="#aa0000")],
     [ps.Text("", key="Keterangan", font=20, background_color="#aa0000")],
-    [ps.Button("Ulang"), ps.Text("Pencet 'R' untuk ulang")]
+    [ps.Button("Ulang", button_color=buttonColor), ps.Text("Pencet 'R' untuk ulang")]
 ]
 
+allColumnKey = ["PilihanUser", "vs", "PilihanBot", "Keterangan", ""]
+allBgKey = ["kertas", "batu", "gunting", "Apply", "Save", "Exit", "random", "Ulang"]
 mainLayout = [ # Sumpah ini berantakan co
-    [ps.Text("-"*(CENTERWIDTH-len(TITLE)-titleSpace)+" "*titleSpace+TITLE+" "*titleSpace+"-"*(CENTERWIDTH-len(TITLE)-titleSpace))],
-    [ps.Text("\n"*10)],
-    [ps.Text(" "*(CENTERWIDTH-25)), ps.Button("🖐️", size=(5, 2), font=20, key="kertas", disabled_button_color="gray"), ps.Button("✌️", size=(5, 2), font=20, key="gunting", disabled_button_color="gray"), ps.Button("✊", size=(5, 2), font=20, key="batu", disabled_button_color="gray")],
-    [ps.Text(" "*(CENTERWIDTH-25)), ps.Text("Win : 0", key="winCount"), ps.Text("Lost : 0", key="lostCount")],
-    [ps.Text(" "*(CENTERWIDTH-25)), ps.Text("Highest Win Streak : 0", key="ws"), ps.Text("Highest Lose Streak : 0", key="ls")],
-    [ps.Column(resultLayout, visible=False, justification="center", key="ResultContainer", background_color="#aa0000", size=(300, 150))]
+    [ps.Text("-"*(CENTERWIDTH-len(TITLE)-titleSpace)+" "*titleSpace+TITLE+" "*titleSpace+"-"*(CENTERWIDTH-len(TITLE)-titleSpace), background_color="#666666")],
+    [ps.Text("\n"*10, background_color=backgroundColor)],
+    [ps.Text(" "*(CENTERWIDTH-25), key="t1", background_color=backgroundColor), ps.Button("🖐️", size=(5, 2), font=20, key="kertas", disabled_button_color=buttonColor, button_color=buttonColor), ps.Button("✌️", size=(5, 2), font=20, key="gunting", disabled_button_color="gray", button_color=buttonColor), ps.Button("✊", size=(5, 2), font=20, key="batu", disabled_button_color="gray", button_color=buttonColor)],
+    [ps.Text(" "*(CENTERWIDTH-6),background_color=backgroundColor), ps.Button("RANDOM", key="random", button_color=buttonColor, size=(5, 1), font=20, disabled_button_color=buttonColor)],
+    [ps.Text(" "*(CENTERWIDTH-25), key="t2", background_color=backgroundColor), ps.Text("Win : "+str(winCount), key="winCount", background_color=backgroundColor), ps.Text("Lost : "+str(lostCount), key="lostCount", background_color=backgroundColor)],
+    [ps.Text(" "*(CENTERWIDTH-25), key="t3", background_color=backgroundColor), ps.Text("Highest Win Streak : "+str(winStreak), key="ws", background_color=backgroundColor), ps.Text("Highest Lose Streak : "+str(loseStreak), key="ls", background_color=backgroundColor)],
+    [ps.Column(resultLayout, visible=False, justification="center", key="ResultContainer", background_color="#222222", size=(300, 150))]
+]
+
+validBackground = ["Dark", "Red", "Light"]
+optionLayout = [
+    [ps.Text("Button Background : ", background_color=backgroundColor), ps.Spin(validBackground, key="ButtonBackgroundSelect")],
+    [ps.Text("Result Background : ", background_color=backgroundColor), ps.Spin(validBackground, key="ResultBackgroundSelect")],
+    [ps.Button("Apply", button_color=buttonColor)],
+    [ps.Button("Save", button_color=buttonColor)]
 ]
 
 lastLayout = [
-    [ps.Text("\n"*15, key="Spaces")],
-    [ps.Button('Exit')]
+    [ps.Text("\n"*4, background_color=backgroundColor, key="Spaces")],
+    [ps.Button('Exit', button_color=buttonColor)]
 ]
 
 
-Layout = mainLayout+lastLayout
-window = ps.Window(title=TITLE, layout=Layout, size=(WIDTH, HEIGHT))
+Layout = [[ps.Column(mainLayout+optionLayout+lastLayout, background_color=backgroundColor, key="Body")]]
+
+window = ps.Window(TITLE, Layout, size=(WIDTH, HEIGHT), background_color=backgroundColor)
 showResult = False
 closeResult = False
 
-winCount = 0
-lostCount = 0
+def change_bg(col:str, col2):
+    for item in allBgKey:
+        window[item].Widget.config(background=col)
 
-winStreak = 0
-loseStreak = 0
-currentWs = 0
-currentLs = 0
+    window["ResultContainer"].update(background_color=col2)
+
 
 def get_key_down(e):
     global closeResult
@@ -95,6 +129,25 @@ while run:
 
         showResult = False
         closeResult = False
+
+    elif event == "Apply":
+        selectedButtonBackground = COLOR_CONVERTER[value["ButtonBackgroundSelect"].lower()]
+        selectedResultBackground = COLOR_CONVERTER[value["ResultBackgroundSelect"].lower()]
+        change_bg(selectedButtonBackground, selectedResultBackground)
+
+    elif event == "random":
+        choice = random.choice(["batu", "gunting", "kertas"])
+        window[choice]._ClickHandler(choice)
+
+    elif event == "Save":
+        f = open(SAVE_FILE_PATH, 'w+')
+        f.write(f'''WinCount = {winCount}
+LostCount = {lostCount}
+WinStreak = {winStreak}
+LoseStreak = {loseStreak}
+CurrentWS = {currentWs}
+CurrentLS = {currentLs}''')
+        f.close()
 
     else:
         window["kertas"].update(disabled=True)
