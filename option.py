@@ -2,14 +2,14 @@
 
 class Option:
     """Option With case-insensitivity"""
-    DIRECT_MODIFIABLE_INSTANCE_ATTRS = ['name']
+    SETABLE_INSTANCE_ATTRS = ['name']
     OPTIONS = {}
 
     def __setattr__(self, name, value):
         return self.__setitem__(name, value)
 
     def __setitem__(self, name, value):
-        if name not in super().__getattribute__('DIRECT_MODIFIABLE_INSTANCE_ATTRS'):
+        if name not in super().__getattribute__('SETABLE_INSTANCE_ATTRS'):
             return self._data.__setitem__(name, value)
         return super().__setattr__(name, value)
 
