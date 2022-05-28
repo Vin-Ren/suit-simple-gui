@@ -1,12 +1,14 @@
+
+import random
+import PySimpleGUI as ps
+import option
+import os
+from pynput import keyboard
+
+
 def start():
-    import random
-    import PySimpleGUI as ps
-    import option
-    import os
     listDir = os.path.dirname(os.path.realpath(__file__))
     import save
-
-    from pynput import keyboard
 
     SAVE_FILE_PATH = listDir+r"\save.py"
     def enemy_pick_randomizer():
