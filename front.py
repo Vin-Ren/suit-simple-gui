@@ -1,9 +1,70 @@
 
 import random
+from typing import Union
 import PySimpleGUI as ps
 import option
 import os
 from pynput import keyboard
+
+
+class GUI:
+    def __setitem__(self, name, value):
+        return self.add_layout(name, value)
+    def __getitem__(self, name):
+        return self.get_layout(name)
+    
+    def __init__(self, **kwargs):
+        self.window_kwargs = kwargs
+        self.layouts = {}
+        self.window = None
+    
+    def set_options(**kw):
+        return ps.set_options(**kw)
+    
+    def add_layout(self, name, component_lists):
+        self.layouts[name] = component_lists
+        return self
+    
+    def get_layout(self, name):
+        return self.layouts.get(name, [])
+    
+    def get_layouts(self, names: Union[str, list], string_sep=None):
+        if isinstance(names, str):
+            if string_sep is None:
+                for sep in [' ', '+', ', ', ',']:
+                    if names.split(sep) > 1:
+                        string_sep = sep
+                        break
+            names = names.split(string_sep)
+        return [self.get_layout(name) for name in names]
+    
+    def init_window(self, *args, **kwargs):
+        window_kw = self.window_kwargs.copy()
+        window_kw.update(kwargs)
+        self.window = ps.Window(*args, **window_kw)
+        return self
+
+
+class Game:
+    def __init__(self, config: dict):
+        self.game_state = {}
+        self.gui = GUI()
+        self.config = config
+    
+    def save_game_state(self):
+        pass
+    
+    def load_save_state(self):
+        pass
+    
+    def create_gui(self):
+        pass
+    
+    def keyboard_key_down_listener(self):
+        pass
+    
+    def main_loop(self):
+        pass
 
 
 def start():
