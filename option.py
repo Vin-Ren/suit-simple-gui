@@ -1,9 +1,16 @@
 
 
+import random
+
+
 class Option:
     """Option With case-insensitivity"""
     DIRECT_MODIFIABLE_INSTANCE_ATTRS = ['name']
     OPTIONS = {}
+    
+    @classmethod
+    def random(cls):
+        return random.choice(cls.OPTIONS.items())
 
     def __setattr__(self, name, value):
         return self.__setitem__(name, value)
