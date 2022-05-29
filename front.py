@@ -7,11 +7,22 @@ import os
 from pynput import keyboard
 
 
+class SimpleNamespace(dict):
+    def __getattribute__(self, name):
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            return super().__getitem__(name)
+
+    def __setattr__(self, name, value) -> None:
+        return super().__setitem__(name, value)
+
+
 class GUI:
     def __setitem__(self, name, value):
         return self.add_layout(name, value)
     def __getitem__(self, name):
-        return self.get_layout(name)
+        return self.get_layout(name) if all([not name.__contains__(sep) for sep in [' ', '+', ', ', ',']]) else self.get_layouts(name)
     
     def __init__(self, **kwargs):
         self.window_kwargs = kwargs
@@ -47,6 +58,7 @@ class GUI:
 
 class Game:
     def __init__(self, config: dict):
+        self.data_passthrough = SimpleNamespace()
         self.game_state = {}
         self.gui = GUI()
         self.config = config
