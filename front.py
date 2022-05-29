@@ -43,7 +43,7 @@ class GUI:
         self.layouts = {}
         self.window = None
     
-    def set_options(**kw):
+    def set_options(self, **kw):
         return ps.set_options(**kw)
     
     def add_layout(self, name, component_lists):
@@ -80,7 +80,7 @@ class Game:
                                                                  "light":"#aaaaaa",
                                                                  "dark":"#222222"
                                                                  })
-        self.game_state = SimpleNamespace({name:0 for name in ['WinCount', 'lostCount', 'winStreak', 'loseStreak', 'currentWs', 'currentLs']})
+        self.game_state = SimpleNamespace({name:0 for name in ['winCount', 'lostCount', 'winStreak', 'loseStreak', 'currentWs', 'currentLs']})
         self.gui = GUI()
         
         self._init()
@@ -109,8 +109,11 @@ class Game:
         return self
     
     def load_save_state(self):
-        with open(self.config.save_filename, 'r') as f:
-            self.game_state.update(json.load(f))
+        try:
+            with open(self.config.save_filename, 'r') as f:
+                self.game_state.update(json.load(f))
+        except (FileNotFoundError, FileExistsError):
+            pass
         return self
     
     def create_gui(self):
@@ -237,7 +240,7 @@ class Game:
                     if self.game_state.currentLs > self.game_state.loseStreak:
                         self.game_state.loseStreak = self.game_state.currentLs
 
-                description = "Menang Yey" if description is True else "Kalah :(" if description is False else "Seri!"
+                description = "Menang Yey" if result is True else "Kalah :(" if result is False else "Seri!"
 
                 self.window["PilihanUser"].update(opsiPemain.display_char)
                 self.window["PilihanBot"].update(enemyPick.display_char)

@@ -10,7 +10,7 @@ class Option:
     
     @classmethod
     def random(cls):
-        return random.choice(cls.OPTIONS.items())
+        return random.choice(list(cls.OPTIONS.values()))
 
     def __setattr__(self, name, value):
         return self.__setitem__(name, value)
