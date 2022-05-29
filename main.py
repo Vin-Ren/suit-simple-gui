@@ -1,8 +1,5 @@
-from front import start
-
-def main():
-    start()
+from front import Game, config
 
 
 if __name__ == '__main__':
-    main()
+    Game(config).run()
